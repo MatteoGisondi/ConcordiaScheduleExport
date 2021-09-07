@@ -21,5 +21,5 @@ $ python -m pip install -r requirements.txt
     - The easiest way to select what we need is by inputing the keyboard shortcut `ctrl+shift+c`, placing the cursor just below List View, Weekly Calendar View and View in Class Schedule Builder, such that each class is highlighted blue, and expanding the resulting html in the Elements tab on the right until we reach the required xpath.
     - **Note: If you hover on an element, it will highlight the corresponding html element on the page. Use this in order to reach the correct `<tbody>` element).**
 4. Once selected, right click > Copy > Copy element, and paste the contents in myconcordia.html.
-5. Run the script via `python import.py`
+5. Run the script via `python export.py`
   - The output calendar.ics can be manually imported into Google Calendar, or any other calendar app of choice.
