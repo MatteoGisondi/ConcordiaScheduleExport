@@ -1,10 +1,10 @@
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 
-# fin should contain the xpath: /html/body/div[1]/div[3]/div[1]/form/div[5]/div[1]/table/tbody/tr/td/div/table/tbody/tr[5]/td/div/table/tbody
+# FILE_IN should contain the xpath: /html/body/div[1]/div[3]/div[1]/form/div[5]/div[1]/table/tbody/tr/td/div/table/tbody/tr[5]/td/div/table/tbody
 # from the list view of a myconcordia schedule
-fin = 'myconcordia.html'
-fout = 'calendar.ics'
+FILE_IN = 'myconcordia.html'
+FILE_OUT = 'calendar.ics'
 
 
 class Course():
@@ -82,8 +82,8 @@ class Course():
 
 
 def main():
-    with open(fin, 'r') as f:
-        soup = BeautifulSoup(f)
+    with open(FILE_IN, 'r') as f:
+        soup = BeautifulSoup(f, features='html.parser')
         schedule = soup.find_all('div', {'class': 'ui-body'})
     courses_table = [course.find_all('tr') for course in schedule]
     courses = []
@@ -94,7 +94,7 @@ def main():
         courses.append(events)
     courses = list(map(Course, courses))
 
-    with open(fout, 'w+') as f:
+    with open(FILE_OUT, 'w+') as f:
         CALENDAR_HEADER = 'BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n'
         f.write(CALENDAR_HEADER)
         for course in courses:
