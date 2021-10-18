@@ -12,8 +12,7 @@ class Course():
     class Event():
         def __init__(self, course_name, event):
             self.course_name = course_name
-            cols = {'Nbr': -1, 'Section': -1, 'Component': -1,
-                    'Times': -1, 'Room': -1, 'Instructor': -1, 'Date': -1}
+            cols = {'Nbr': -1, 'Section': -1, 'Component': -1, 'Times': -1, 'Room': -1, 'Instructor': -1, 'Date': -1}
             for i in range(len(event)):
                 if cols.get(event[i]):
                     cols[event[i]] = i + 1
@@ -26,13 +25,13 @@ class Course():
                 self.start_time, self.end_time = times.split(' - ')
             else:
                 self.start_time, self.end_time = None, None
-            self.room = event[cols['Room']]
+            self.room = ' '.join(event[cols['Room']:cols['Instructor'] - 1])
             self.instructor = ' '.join(event[cols['Instructor']:cols['Date'] - 2])
             self.start = event[cols['Date']]
             self.end = event[cols['Date'] + 2]
 
         def __repr__(self):
-            return 'Course Name: {}\\nSection: {}\\nInstructor: {}'.format(self.course_name, self.section, self.instructor)
+            return f'Course Name: {self.course_name}\nSection: {self.section}\nInstructor: {self.instructor}'
 
     def __init__(self, course):
         self.course_number, self.course_name = course[0].split(' - ')
@@ -61,24 +60,24 @@ class Course():
         offset = Course.WEEKDAYS[weekdays[0]] - int(start_date.strftime('%w'))
         start_date += timedelta(days=offset)
         start_format = start_date.strftime('%Y%m%d')
-        start_time = '{}T{}'.format(start_format, Course.time_convert(event.start_time))
-        end_time = '{}T{}'.format(start_format, Course.time_convert(event.end_time))
-        end_occurance = '{}{}{}T000000'.format(end_year, end_month, end_day)
-        return 'DTSTART;TZID=America/New_York:{}\nDTEND;TZID=America/New_York:{}\nRRULE:FREQ=WEEKLY;UNTIL={};WKST=SU;BYDAY={}\n'.format(start_time, end_time, end_occurance, ','.join(weekdays))
+        start_time = f'{start_format}T{Course.time_convert(event.start_time)}'
+        end_time = f'{start_format}T{Course.time_convert(event.end_time)}'
+        end_occurance = f'{end_year}{end_month}{end_day}T000000'
+        return f'DTSTART;TZID=America/New_York:{start_time}\nDTEND;TZID=America/New_York:{end_time}\nRRULE:FREQ=WEEKLY;UNTIL={end_occurance};WKST=SU;BYDAY={",".join(weekdays)}\n'
 
     def ICS_event(self, event, alert=15):
-        summary = '{} - {}'.format(self.course_number, event.component)
+        summary = f'{self.course_number} - {event.component}'
         description = event.__repr__()
-        v_event = 'BEGIN:VEVENT\n{}{}{}END:VEVENT\n'
-        content = 'SUMMARY:{}\nLOCATION:{}\nDESCRIPTION:{}\nSTATUS:CONFIRMED\n'.format(summary, event.room, description)
+        content = f'SUMMARY:{summary}\nLOCATION:{event.room}\nDESCRIPTION:{description}\nSTATUS:CONFIRMED\n'
         r_rule = Course.generate_r_rule(event)
-        v_alarm = 'BEGIN:VALARM\nTRIGGER:-P{}M\nDESCRIPTION:{}\nACTION:DISPLAY\nEND:VALARM\n'.format(alert, description)
+        v_alarm = f'BEGIN:VALARM\nTRIGGER:-P{alert}M\nDESCRIPTION:{description}\nACTION:DISPLAY\nEND:VALARM\n'
         if alert:
-            return v_event.format(content, r_rule, v_alarm)
-        return v_event.format(content, r_rule, '')
+            return f'BEGIN:VEVENT\n{content}{r_rule}{v_alarm}END:VEVENT\n'
+        return f'BEGIN:VEVENT\n{content}{r_rule}END:VEVENT\n'
 
     def __repr__(self):
-        return '{} - {} ({} - {}):\n\t{}'.format(self.course_number, self.course_name, self.start, self.end, '\n\t'.join(map(lambda x: x.__repr__(), self.events)))
+        events = '\n\t'.join(map(lambda x: x.__repr__(), self.events))
+        return f'{self.course_number} - {self.course_name} ({self.start} - {self.end}):\n\t{events}'
 
 
 def main():
