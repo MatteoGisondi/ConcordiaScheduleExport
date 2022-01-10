@@ -53,9 +53,9 @@ class Course():
 
     @staticmethod
     def generate_r_rule(event):
-        start_month, start_day, start_year = map(int, event.start.split('/'))
+        start_day, start_month, start_year = map(int, event.start.split('/'))
         start_date = datetime(start_year, start_month, start_day)
-        end_month, end_day, end_year = event.end.split('/')
+        end_day, end_month, end_year = event.end.split('/')
         weekdays = [event.weekdays[i:i + 2].upper() for i in range(0, len(event.weekdays), 2)]
         offset = Course.WEEKDAYS[weekdays[0]] - int(start_date.strftime('%w'))
         start_date += timedelta(days=offset)
